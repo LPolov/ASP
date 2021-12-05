@@ -1,0 +1,41 @@
+@model OnlineShop.Areas.Account.Models.LoginUserVM
+
+@{
+    ViewBag.Title = "Login";
+    Layout = "Login_Layout";
+}
+
+<h2>Login</h2>
+
+<div class="justify-content-center">
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal align-items-center">
+            @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+            <div class="form-outline mb-4">
+                @Html.LabelFor(  model => model.Email, htmlAttributes: new {@class = "control-label col-md-2"})
+                <div class="col-md-10 w-25">
+                    @Html.EditorFor(model => model.Email, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.Email, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-outline mb-4">
+                @Html.LabelFor(  model => model.Password, htmlAttributes: new {@class = "control-label col-md-2"})
+                <div class="col-md-10 w-25">
+                    @Html.PasswordFor(model => model.Password, new {htmlAttributes = new {@class = "form-control"}})
+                    @Html.ValidationMessageFor(model => model.Password, "", new {@class = "text-danger"})
+                </div>
+            </div>
+    
+            <div class="form-group">
+                <div class="offset-2 col">
+                    @Html.ActionLink( "Forgot password?", "ResetPassword", "User", new { Area = "Account" }, new {@class = "btn btn-danger"})
+                    <input type="submit" value="Login" class="btn btn-success"/>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+

@@ -1,0 +1,18 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using OnlineShop.Areas.Account.Data;
+using OnlineShop.Areas.Admin.Models;
+using OnlineShop.Models;
+
+namespace OnlineShop.Data
+{
+    public class ApplicationDbContext : IdentityDbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
+        public DbSet<PageDto> Pages { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    }
+}
