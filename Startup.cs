@@ -83,7 +83,7 @@ namespace OnlineShop
                 endpoints.MapAreaControllerRoute(
                     name: "customer",
                     areaName: "Customer",
-                    pattern: "Customer/{controller=Customer}/{action=Index}/{id?}"
+                    pattern: "Customer/{controller=Customer}/{action=Index}"
                 );
                 endpoints.MapRazorPages();
             });

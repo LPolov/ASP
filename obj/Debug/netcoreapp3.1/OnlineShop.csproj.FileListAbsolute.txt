@@ -181,3 +181,5 @@
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Account/Views/User/Register.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Customer/Views/Customer/Index.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Account/Views/User/ResetPassword.cshtml.g.cs
+/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Customer/Views/Product/Products.cshtml.g.cs
+/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Customer/Views/Product/ProductDetails.cshtml.g.cs

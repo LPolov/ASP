@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OnlineShop.Areas.Account.Data;
+using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
 using OnlineShop.Models;
 
@@ -14,5 +15,7 @@ namespace OnlineShop.Data
         }
         public DbSet<PageDto> Pages { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
     }
 }

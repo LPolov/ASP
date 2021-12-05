@@ -10,11 +10,5 @@ namespace OnlineShop.Areas.Customer.Controllers
         {
             return View();
         }
-        
-        [HttpGet]
-        public IActionResult Products()
-        {
-            return View();
-        }
     }
 }

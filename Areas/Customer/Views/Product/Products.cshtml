@@ -1,0 +1,49 @@
+@using OnlineShop.Areas.Admin.Models
+@model dynamic
+
+@{
+    ViewBag.Title = "Products";
+    Layout = "_Layout";
+}
+
+<h2>Products</h2>
+@using (Html.BeginForm("Products","Product"))
+{
+    @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+    <div class="input-group">
+        <input class="form-control" name="searchWord"/>
+        <div class="input-group-append">
+            <button type="submit" class="btn btn-warning">Search</button>
+        </div>
+    </div>
+}
+
+@using (Html.BeginForm())
+    {
+        <div>  
+            <h2>Select Category</h2>
+            @foreach (CategoryVM category in Model.Categories)
+            {
+                var url = Url.Action("ProductsByCategories", "Product", new {categoryId = category.Id}, null);
+                @Html.CheckBox(category.Id + "", category.IsChecked,new {onclick = "window.location = '" + url + "'"});
+                <label for="@category.Id" + category.Id>@category.Name</label>
+
+        }
+    </div>  
+    <p>  
+    <asp:Button ID="Button1" runat="server" Text="Button" OnClick="Button1_Click" />  
+    </p> 
+    }
+
+    <div class="row mt-5 mb-2">
+    @foreach (var product in Model.Products)
+    {
+        <div class="col-lg-4">
+            <img class="img-thumbnail" src="@product.Image"/>
+            <h2>@product.Name</h2>
+            <p>@product.Description</p>
+            <p>Price: $@product.Price</p>
+            <p>@Html.ActionLink("Details", "ProductDetails", "Product", new { id = product.Id}, new {@class="btn btn-warning"})</p>
+        </div>
+    }
+</div>
