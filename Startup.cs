@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OnlineShop.Areas.Chat.Data;
 using OnlineShop.Data;
 
 namespace OnlineShop
@@ -35,6 +36,7 @@ namespace OnlineShop
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
            services.AddRazorPages();
+           services.AddSignalR();
            
            //Authentication
            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -84,6 +86,13 @@ namespace OnlineShop
                     name: "customer",
                     areaName: "Customer",
                     pattern: "Customer/{controller=Customer}/{action=Index}"
+                );
+                
+                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapAreaControllerRoute(
+                    name: "chat",
+                    areaName: "Chat",
+                    pattern: "Chat/{controller=Chat}/{action=Index}"
                 );
                 endpoints.MapRazorPages();
             });
