@@ -1,18 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Numerics;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShop.Areas.Account.Models;
 using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
 using OnlineShop.Data;
 
-namespace OnlineShop.Areas.Customer.Controllers
+namespace OnlineShop.Areas.Admin.Controllers
 {
-    [Area("Customer")]
+    [Area("Admin")]
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -26,7 +23,7 @@ namespace OnlineShop.Areas.Customer.Controllers
         [HttpGet]
         public IActionResult Products()
         {
-            IEnumerable<Product> products = _db.Products.OrderBy(p => p.Rate).ToList();
+            IEnumerable<Product> products = _db.Products.OrderByDescending(p => p.Rate).ToList();
             List<ProductVM> productViews = new List<ProductVM>();
             
             foreach (var product in products)
@@ -50,6 +47,54 @@ namespace OnlineShop.Areas.Customer.Controllers
             return View(productPageModel);
         }
         
+        [HttpGet]
+        public IActionResult EditProduct(int id)
+        {
+            ProductVM model;
+            Product dto = _db.Products.Find(id);
+            if (dto == null)
+            {
+                return Content("This page does not exist.");
+            }
+
+            model = new ProductVM(dto);
+            model.Category = new CategoryVM(_db.Categories.Find(dto.CategoryId));
+            return View(model);
+        }
+        
+        [HttpPost]
+        public IActionResult EditProduct(ProductVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (!_db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).Any())
+            {
+                List<Category> categories = _db.Categories.ToList();
+                string categoryNames = "";
+                foreach (var category in categories)
+                {
+                    categoryNames += category.Name + ", ";
+                }
+
+                categoryNames = categoryNames.Substring(0, categoryNames.Length - 2);
+                ModelState.AddModelError("", "This category does not exist. Categories available: " + categoryNames);
+                return View(model);
+            }
+
+            Product dto = _db.Products.Find(model.Id);
+            Category newCategoryDto = _db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).First();
+            
+            dto.UpdateByModel(model);
+            dto.CategoryId = newCategoryDto.Id;
+            _db.Update(dto);
+            _db.SaveChanges();
+            // send successful message
+            TempData["PSM"] = "You have updated " + dto.Name + " product.";
+            return RedirectToAction("Products");
+        }
         [HttpPost]
         public IActionResult Products(string searchWord)
         {
@@ -95,13 +140,6 @@ namespace OnlineShop.Areas.Customer.Controllers
             return View("Products", productPageModel);
         }
         
-        [HttpPost]
-        protected void Products(object sender, EventArgs e)
-        {
-
-        
-        }
-
         [HttpGet]
         public IActionResult ProductsByCategories(int categoryId)
         {
@@ -147,15 +185,81 @@ namespace OnlineShop.Areas.Customer.Controllers
             productPageModel.searchWord = "";
             return View("Products", productPageModel);
         }
-
-
+        
         [HttpGet]
-        public IActionResult ProductDetails(int id)
+        public IActionResult DeleteProduct(int id)
         {
-            Product product = _db.Products.Find(id);
-            ProductVM productVm = new ProductVM(product);
-            productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-            return View(productVm);
+            Product dto = _db.Products.Find(id);
+            _db.Products.Remove(dto);
+            _db.SaveChanges();
+            // send successful message
+            TempData["PSM"] = "You have deleted " + dto.Name + " product.";
+            return RedirectToAction("Products");
+        }
+        
+        [HttpGet]
+        public IActionResult AddProduct()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        public IActionResult AddProduct(ProductVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string description;
+            Product dto = new Product();
+            dto.Name = model.Name.ToLower();
+            if (string.IsNullOrWhiteSpace(model.Description))
+            {
+                description = model.Name.Replace(" ", "-");
+            }
+            else
+            {
+                description = model.Description;
+            }
+
+            if (_db.Products.Any(p => p.Name == model.Name.ToLower()))
+            {
+                ModelState.AddModelError("", "This name already exists.");
+                return View(model);
+            }
+
+            dto.Description = description;
+            dto.Price = model.Price;
+            dto.Rate = model.Rate;
+            dto.Image = model.Image;
+            
+            if (!_db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).Any())
+            {
+                List<Category> categories = _db.Categories.ToList();
+                string categoryNames = "";
+                foreach (var category in categories)
+                {
+                    categoryNames += category.Name + ", ";
+                }
+
+                categoryNames = categoryNames.Substring(0, categoryNames.Length - 2);
+                ModelState.AddModelError("", "This category does not exist. Categories available: " + categoryNames);
+                return View(model);
+            }
+            
+            Category newCategoryDto = _db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).First();
+            
+            dto.UpdateByModel(model);
+            dto.CategoryId = newCategoryDto.Id;
+
+            _db.Products.Add(dto);
+            _db.SaveChanges();
+            // send successful message
+            TempData["PSM"] = "You have added new product";
+            return RedirectToAction("Products");
         }
     }
+    
+    
 }

@@ -35,8 +35,15 @@
                             @Html.ActionLink( "Logout", "Logout", "User", new { Area = "Account" }, new {@class="nav-link text-dark"})
                         </li>
                         <li class="nav-item">
+                            @Html.ActionLink( "Products", "Products", "Product", new { Area = "Admin" }, new {@class="nav-link text-dark"})
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink( "Categories", "Categories", "Category", new { Area = "Admin" }, new {@class="nav-link text-dark"})
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        
                     </ul>
                 </div>
             </div>

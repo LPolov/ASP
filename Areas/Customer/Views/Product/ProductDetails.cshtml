@@ -8,8 +8,10 @@
 <h2>Product Details</h2>
 <div class="col-lg-4 mt-2">
     <img class="img-thumbnail" src="@Model.Image"/>
-    <h2>Name: @Model.Name</h2>
+    <h4>Name: @Model.Name</h4>
     <p>Description: @Model.Description</p>
     <p>Price: $@Model.Price</p>
+    <p>Category: @Model.Category.Name</p>
+    <p>Category description: @Model.Category.Description</p>
     <p>@Html.ActionLink("Order", "", "", null, new {@class="btn btn-warning"})</p>
 </div>

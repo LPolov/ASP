@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using OnlineShop.Areas.Admin.Models;
 
 namespace OnlineShop.Areas.Admin.Data
 {
@@ -12,5 +13,11 @@ namespace OnlineShop.Areas.Admin.Data
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
+        
+        public void UpdateByModel(CategoryVM model)
+        {
+            Name = model.Name;
+            Description = model.Description;
+        }
     }
 } 

@@ -1,0 +1,51 @@
+@model List<OnlineShop.Areas.Admin.Models.CategoryVM>
+
+@{
+    ViewBag.Title = "Categories";
+    Layout = "_Layout";
+}
+
+<h2>Categories</h2>
+@if (TempData["CSM"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["CSM"]
+    </div>
+}
+<p>
+    @Html.ActionLink( "Create new Category", "AddCategory", "Category", null, new {@class="btn btn-success"})
+</p>
+
+<table class="table">
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th></th>
+    </tr>
+    
+    @foreach(var item in Model)
+    {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.Name)</td>
+            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+            <td>
+                @Html.ActionLink("Edit", "EditCategory", new {id=item.Id}) |
+                @Html.ActionLink("Delete", "DeleteCategory", new {id=item.Id}, new {@class = "delete"})
+
+            </td>
+        </tr>
+    }
+</table>
+@section Scripts
+{
+    <script>
+        $(function () {
+            /*Page delete confirmation*/
+            $("a.delete").click(function (){
+                if (!confirm("Are you sure that you want to delete this category?")) {
+                    return false;
+                }
+            })
+        })
+    </script>
+}
