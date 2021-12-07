@@ -22,10 +22,9 @@
       <Folder Include="Areas\Chat\Models" />
       <Folder Include="Areas\Chat\Pages" />
       <Folder Include="Areas\Chat\Views" />
-      <Folder Include="Areas\Customer\Models" />
-      <Folder Include="Areas\Customer\Pages" />
-      <Folder Include="Areas\Customer\wwwroot" />
+      <Folder Include="Areas\Identity\Controllers" />
       <Folder Include="Areas\Identity\Data" />
+      <Folder Include="Areas\Identity\Models" />
       <Folder Include="Areas\Identity\Views" />
     </ItemGroup>
 

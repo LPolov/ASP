@@ -6,6 +6,9 @@ using OnlineShop.Data;
 
 namespace OnlineShop.Areas.Chat.Controllers
 {
+    /*
+     * Class to cover chat functionality.
+     */
     [Area("Chat")]
     [Authorize]
     public class ChatController : Controller
@@ -16,12 +19,15 @@ namespace OnlineShop.Areas.Chat.Controllers
         {
             _db = db;
         }
-        // GET
+        
+        /*
+         * Method takes logged in user and passes it to the view, which is used to display a chat.
+         */
+        [HttpGet]
         public IActionResult Index()
         {
-            string email = HttpContext.User.Claims.Where(c => c.Type == "email").First().Value;
-            ApplicationUser user = _db.ApplicationUsers.Where(u =>
-                u.Email == email).First();
+            string email = HttpContext.User.Claims.First(c => c.Type == "email").Value;
+            ApplicationUser user = _db.ApplicationUsers.First(u => u.Email == email);
             return View(user);
         }
     }

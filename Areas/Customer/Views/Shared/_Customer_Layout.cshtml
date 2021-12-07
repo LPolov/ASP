@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 <!DOCTYPE html>
@@ -22,23 +21,29 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
+                        <!--Link to Products page-->
                         <li class="nav-item">
                             @Html.ActionLink("Products", "Products", "Product", new {Area = "Customer"}, new {@class = "nav-link text-dark"})
                         </li>
+                        <!--Link to Chat page-->
+                        <li class="nav-item">
+                            @Html.ActionLink("Chat", "Index", "Chat", new {Area = "Chat"}, new {@class = "nav-link text-dark"})
+                        </li>
                         <ul class="navbar-nav">
+                            <!--If user logged in then Logout is displayed, otherwise - Login and Register are displayed-->
                             @if (User.Identity.IsAuthenticated)
                             {
                                 <li class="nav-item">
-                                    @Html.ActionLink("Logout", "Logout", "User", new {Area = "Account"}, new {@class="nav-link btn btn-link text-dark"})
+                                    @Html.ActionLink("Logout", "Logout", "User", new {Area = "Account"}, new {@class = "nav-link btn btn-link text-dark"})
                                 </li>
                             }
                             else
                             {
                                 <li class="nav-item">
-                                    @Html.ActionLink("Register", "Register", "User", new {Area = "Account"}, new {@class="nav-link text-dark"})
+                                    @Html.ActionLink("Register", "Register", "User", new {Area = "Account"}, new {@class = "nav-link text-dark"})
                                 </li>
                                 <li class="nav-item">
-                                    @Html.ActionLink("Login", "Login", "User", new {Area = "Account"}, new {@class="nav-link text-dark"})
+                                    @Html.ActionLink("Login", "Login", "User", new {Area = "Account"}, new {@class = "nav-link text-dark"})
                                 </li>
                             }
                         </ul>

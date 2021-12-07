@@ -8,9 +8,9 @@
 
 <h2>Products</h2>
 
+<!--Form for searching products by name-->
 @using (Html.BeginForm("Products","Product"))
 {
-    @Html.ValidationSummary(true, "", new {@class = "text-danger"})
     <div class="input-group">
         <input class="form-control" name="name"/>
         <div class="input-group-append">
@@ -19,22 +19,23 @@
     </div>
 }
 
+<!--Form for searching products by category-->
 @using (Html.BeginForm())
     {
         <div>  
             <h2>Select Category</h2>
             @foreach (CategoryVM category in Model.Categories)
             {
+                <!--Variable is used for dynamic call of controller's method when user clicks on category-->
                 var url = Url.Action("ProductsByCategories", "Product", new {categoryId = category.Id}, null);
                 @Html.CheckBox(category.Id + "", category.IsChecked,new {onclick = "window.location = '" + url + "'"});
                 <label for="@category.Id" + category.Id>@category.Name</label>
 
-        }
-    </div>  
-    <p>  
-    <asp:Button ID="Button1" runat="server" Text="Button" OnClick="Button1_Click" />  
-    </p> 
+            }
+        </div>
     }
+
+<!--Div to display product not found message-->
 @if (TempData["MNF"] != null)
 {
     <div class="alert alert-danger">
@@ -42,7 +43,8 @@
     </div>
 }
 
-    <div class="row mt-5 mb-2">
+<!--Div to display all products from db-->
+<div class="row mt-5 mb-2">
     @foreach (var product in Model.Products)
     {
         <div class="col-lg-4">
