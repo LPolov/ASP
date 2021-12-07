@@ -7,11 +7,12 @@
 }
 
 <h2>Products</h2>
+
 @using (Html.BeginForm("Products","Product"))
 {
     @Html.ValidationSummary(true, "", new {@class = "text-danger"})
     <div class="input-group">
-        <input class="form-control" name="searchWord"/>
+        <input class="form-control" name="name"/>
         <div class="input-group-append">
             <button type="submit" class="btn btn-warning">Search</button>
         </div>
@@ -34,6 +35,12 @@
     <asp:Button ID="Button1" runat="server" Text="Button" OnClick="Button1_Click" />  
     </p> 
     }
+@if (TempData["MNF"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["MNF"]
+    </div>
+}
 
     <div class="row mt-5 mb-2">
     @foreach (var product in Model.Products)

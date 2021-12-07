@@ -4,6 +4,8 @@
     ViewBag.Title = "Welcome";
     Layout = "_Customer_Layout";
 }
+
+<!--If connection refused message appears it is displayed in this dib-->
 @if (TempData["CR"] != null)
 {
     <div class="alert alert-danger">

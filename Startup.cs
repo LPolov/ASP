@@ -13,6 +13,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OnlineShop.Areas.Chat.Data;
+using OnlineShop.Areas.Customer.Data;
+using OnlineShop.Areas.Customer.Mappers;
+using OnlineShop.Areas.Customer.Mappers.Impl;
+using OnlineShop.Areas.Customer.Services;
 using OnlineShop.Data;
 
 namespace OnlineShop
@@ -37,6 +41,15 @@ namespace OnlineShop
             services.AddControllersWithViews();
            services.AddRazorPages();
            services.AddSignalR();
+           //Add Services to context
+           services.AddTransient<IProductService, DefaultProductService>();
+           services.AddTransient<ICategoryService, DefaultCategoryService>();
+           //Add repositories
+           services.AddTransient<ProductsRepository>();
+           services.AddTransient<CategoryRepository>();
+           //Add mappers
+           services.AddTransient<IProductMapper, DefaultProductMapper>();
+           services.AddTransient<ICategoryMapper, DefaultCategoryMapper>();
            
            //Authentication
            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

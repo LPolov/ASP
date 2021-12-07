@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -6,146 +5,101 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
+using OnlineShop.Areas.Customer.Services;
 using OnlineShop.Data;
 
 namespace OnlineShop.Areas.Customer.Controllers
 {
+    /*
+     * Controller that is used to process data from user and display appropriate
+     * pages related to products.
+     */
     [Area("Customer")]
     public class ProductController : Controller
     {
+        private IProductService _productService;
+        private ICategoryService _categoryService;
         private readonly ApplicationDbContext _db;
-        private static HashSet<int> CategoryIds = new HashSet<int>();
-        
-        public ProductController(ApplicationDbContext db)
+
+        public ProductController(IProductService productService, ICategoryService categoryService, ApplicationDbContext db)
         {
+            _productService = productService;
+            _categoryService = categoryService;
             _db = db;
         }
 
+        /*
+         * Method returns simple welcome page with static content.
+         * Authorization is not required to get an access to this page.
+         * If not authorized user or user with lack in authorities is trying to go to a restricted page
+         * he/she is redirected to this page with error message displayed on it.
+         */
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        // GET
+        /*
+         * Method returns a page with all products from database ordered by rate descending.
+         * User can search products by name, or can select needed categories to get products belong to them.
+         */
         [HttpGet]
         public IActionResult Products()
         {
-            IEnumerable<Product> products = _db.Products.OrderBy(p => p.Rate).ToList();
-            List<ProductVM> productViews = new List<ProductVM>();
+            //Getting products and categories models to display on the page
+            List<ProductVM> products = _productService.GetProducts();
+            List<CategoryVM> categories = _categoryService.GetCategories();
             
-            foreach (var product in products)
-            {
-                ProductVM productVm = new ProductVM(product);
-                productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-                productViews.Add(productVm);
-            }
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            List<CategoryVM> categoryViews = new List<CategoryVM>();
-            foreach (var category in categories)
-            {
-                CategoryVM categoryVm = new CategoryVM(category);
-                categoryViews.Add(categoryVm);
-            }
-            
+            //Creating dynamic model to pass both Categories and Products to the page
             dynamic productPageModel = new ExpandoObject();
-            productPageModel.Products = productViews;
-            productPageModel.Categories = categoryViews;
-            productPageModel.searchWord = "";
+            productPageModel.Products = products;
+            productPageModel.Categories = categories;
             return View(productPageModel);
         }
         
+        /*
+         * Method allows to search products by name. It takes name from user and searches products
+         * with names which contain it.
+         */
         [HttpPost]
-        public IActionResult Products(string searchWord)
+        public IActionResult Products(string name)
         {
-            if (String.IsNullOrEmpty(searchWord))
-            {
-                return RedirectToAction("Products");
-            }
-
-            IEnumerable<Product> products = _db.Products
-                .Where(p => p.Name.ToLower().Contains(searchWord.ToLower()) && (CategoryIds.Contains(p.CategoryId) || CategoryIds.Count() == 0))
-                .OrderBy(p => p.Rate)
-                .ToList();
-
-            List<ProductVM> productViews = new List<ProductVM>();
-            
-            foreach (var product in products)
-            {
-                ProductVM productVm = new ProductVM(product);
-                productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-                productViews.Add(productVm);
-            }
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            List<CategoryVM> categoryViews = new List<CategoryVM>();
-            foreach (var category in categories)
-            {
-                CategoryVM categoryVm = new CategoryVM(category);
-                if (CategoryIds.Contains(category.Id))
-                {
-                    categoryVm.IsChecked = true;
-                }
-
-                categoryViews.Add(categoryVm);
-            }
-            
+            List<ProductVM> products = _productService.GetProductsByName(name);
+            List<CategoryVM> categories = _categoryService.GetCategories();
             dynamic productPageModel = new ExpandoObject();
-            productPageModel.Products = productViews;
-            productPageModel.Categories = categoryViews;
+            productPageModel.Products = products;
+            productPageModel.Categories = categories;
+            
+            //If no product's name matches received word then error message is displayed on the page
             if (products.Count() == 0)
             {
-                ModelState.AddModelError("", "Product not found.");
+                TempData["MNF"] = "Products not found.";
                 return View(productPageModel);
             }
             return View("Products", productPageModel);
         }
 
+        /*
+         * Displays products by category
+         */
         [HttpGet]
         public IActionResult ProductsByCategories(int categoryId)
         {
-            if (!CategoryIds.Contains(categoryId))
-            {
-                CategoryIds.Add(categoryId);
-            }
-            else
-            {
-                CategoryIds.Remove(categoryId);
-            }
-
-            if (CategoryIds.Count() == 0)
-            {
-                return RedirectToAction("Products");
-            }
-
-            List<Product> products = _db.Products.Where(p => CategoryIds.Contains(p.CategoryId)).OrderBy(p => p.Rate).ToList();
-            List<ProductVM> productViews = new List<ProductVM>();
-            foreach (var product in products)
-            {
-                ProductVM productVm = new ProductVM(product);
-                productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-                productViews.Add(productVm);
-            }
-
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            List<CategoryVM> categoryViews = new List<CategoryVM>();
-            foreach (var category in categories)
-            {
-                CategoryVM categoryVm = new CategoryVM(category);
-                if (CategoryIds.Contains(category.Id))
-                {
-                    categoryVm.IsChecked = !categoryVm.IsChecked;
-                }
-
-                categoryViews.Add(categoryVm);
-            }
+            List<ProductVM> productViews = _productService.GetProductsByCategoryId(categoryId);
+            List<CategoryVM> categories = _categoryService.GetCategories();
             
             dynamic productPageModel = new ExpandoObject();
             productPageModel.Products = productViews;
-            productPageModel.Categories = categoryViews;
-            productPageModel.searchWord = "";
+            productPageModel.Categories = categories;
             return View("Products", productPageModel);
         }
 
 
+        /*
+         * Returns page with details of a chosen product.
+         * To get this page user needs to be authorized.
+         */
         [HttpGet]
         [Authorize]
         public IActionResult ProductDetails(int id)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Xml.XPath;
 using OnlineShop.Areas.Admin.Data;
 
@@ -16,6 +17,8 @@ namespace OnlineShop.Areas.Admin.Models
             Description = dto.Description;
         }
 
+        public static readonly HashSet<int> CategoriesId = new HashSet<int>();
+        
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

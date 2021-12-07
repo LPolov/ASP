@@ -108,7 +108,7 @@ namespace OnlineShop.Areas.Account.Controllers
             ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer"), new Claim("email", model.Email)}, "Cookies");
             ClaimsPrincipal claimPrincipal = new ClaimsPrincipal(claimIdentity);
             await HttpContext.SignInAsync("Cookies", claimPrincipal);
-            return RedirectToAction("Index", "Customer", new { area = "customer" });
+            return RedirectToAction("Index", "Product", new { area = "customer" });
         }
         
         [HttpGet]
@@ -141,7 +141,7 @@ namespace OnlineShop.Areas.Account.Controllers
             dto.Password = model.Password;
             _db.ApplicationUsers.Update(dto);
             _db.SaveChanges();
-            return RedirectToAction("Index", "Customer", new { area = "customer" });
+            return RedirectToAction("Index", "Product", new { area = "customer" });
         }
     }
 }
