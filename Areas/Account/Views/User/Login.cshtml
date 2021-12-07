@@ -29,9 +29,11 @@
             </div>
     
             <div class="form-group">
-                <div class="offset-2 col">
-                    @Html.ActionLink( "Forgot password?", "ResetPassword", "User", new { Area = "Account" }, new {@class = "btn btn-danger"})
+                <div class="col">
                     <input type="submit" value="Login" class="btn btn-success"/>
+                    <hr/>
+                    @Html.ActionLink("Forgot password?", "ResetPassword", "User", new {Area = "Account"}, new {@class = "btn btn-danger"})
+                    @Html.ActionLink("Do not have an account?", "Register", "User", new {Area = "Account"}, new {@class = "btn btn-warning"})
                 </div>
             </div>
         </div>

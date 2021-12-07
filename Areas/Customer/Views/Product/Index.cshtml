@@ -1,0 +1,14 @@
+@model object
+
+@{
+    ViewBag.Title = "Welcome";
+    Layout = "_Customer_Layout";
+}
+@if (TempData["CR"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["CR"]
+    </div>
+}
+<h2>Hello customer!</h2>
+

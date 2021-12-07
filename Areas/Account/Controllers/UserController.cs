@@ -52,12 +52,15 @@ namespace OnlineShop.Areas.Account.Controllers
             }
             if (_db.ApplicationUsers.Where(u => u.IsAdmin).Any(u => u.Email == model.Email.ToLower()))
             {
-                ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "admin")}, "Cookies");
+                ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "admin"), new Claim("email", model.Email)}, "Cookies");
                 ClaimsPrincipal claimPrincipal = new ClaimsPrincipal(claimIdentity);
                 await HttpContext.SignInAsync("Cookies", claimPrincipal);
                 return RedirectToAction("Index", "Page", new { area = "admin" });
             }
-            return RedirectToRoute("admin", "AddPage", "Page");
+            ClaimsIdentity claimUserIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer"), new Claim("email", model.Email)}, "Cookies");
+            ClaimsPrincipal claimUserPrincipal = new ClaimsPrincipal(claimUserIdentity);
+            await HttpContext.SignInAsync("Cookies", claimUserPrincipal);
+            return RedirectToAction("Index", "Product", new { area = "Customer" });
         }
 
         [HttpGet]
@@ -102,7 +105,7 @@ namespace OnlineShop.Areas.Account.Controllers
             _db.ApplicationUsers.Add(dto);
             _db.SaveChanges();
             
-            ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer")}, "Cookies");
+            ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer"), new Claim("email", model.Email)}, "Cookies");
             ClaimsPrincipal claimPrincipal = new ClaimsPrincipal(claimIdentity);
             await HttpContext.SignInAsync("Cookies", claimPrincipal);
             return RedirectToAction("Index", "Customer", new { area = "customer" });

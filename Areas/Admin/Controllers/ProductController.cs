@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineShop.Areas.Account.Data;
 using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
+using OnlineShop.Areas.Admin.Services;
 using OnlineShop.Data;
 
 namespace OnlineShop.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -23,6 +27,13 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Products()
         {
+            //string userType = HttpContext.User.Claims.Where(c => c.Type == "userType").First().Value;
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
+
             IEnumerable<Product> products = _db.Products.OrderByDescending(p => p.Rate).ToList();
             List<ProductVM> productViews = new List<ProductVM>();
             
@@ -50,6 +61,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult EditProduct(int id)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             ProductVM model;
             Product dto = _db.Products.Find(id);
             if (dto == null)
@@ -65,6 +81,12 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult EditProduct(ProductVM model)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "You are not allowed to send post requests here.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
+            
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -98,6 +120,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Products(string searchWord)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "You are not allowed to send post requests here.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             if (String.IsNullOrEmpty(searchWord))
             {
                 return RedirectToAction("Products");
@@ -143,6 +170,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult ProductsByCategories(int categoryId)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             if (!CategoryIds.Contains(categoryId))
             {
                 CategoryIds.Add(categoryId);
@@ -189,6 +221,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult DeleteProduct(int id)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             Product dto = _db.Products.Find(id);
             _db.Products.Remove(dto);
             _db.SaveChanges();
@@ -200,12 +237,22 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult AddProduct()
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             return View();
         }
         
         [HttpPost]
         public IActionResult AddProduct(ProductVM model)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             if (!ModelState.IsValid)
             {
                 return View(model);

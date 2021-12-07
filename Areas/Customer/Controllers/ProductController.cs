@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Numerics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShop.Areas.Account.Models;
 using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
 using OnlineShop.Data;
@@ -22,6 +20,12 @@ namespace OnlineShop.Areas.Customer.Controllers
         {
             _db = db;
         }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         // GET
         [HttpGet]
         public IActionResult Products()
@@ -94,13 +98,6 @@ namespace OnlineShop.Areas.Customer.Controllers
             }
             return View("Products", productPageModel);
         }
-        
-        [HttpPost]
-        protected void Products(object sender, EventArgs e)
-        {
-
-        
-        }
 
         [HttpGet]
         public IActionResult ProductsByCategories(int categoryId)
@@ -150,6 +147,7 @@ namespace OnlineShop.Areas.Customer.Controllers
 
 
         [HttpGet]
+        [Authorize]
         public IActionResult ProductDetails(int id)
         {
             Product product = _db.Products.Find(id);

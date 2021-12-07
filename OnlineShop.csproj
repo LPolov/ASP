@@ -22,7 +22,6 @@
       <Folder Include="Areas\Chat\Models" />
       <Folder Include="Areas\Chat\Pages" />
       <Folder Include="Areas\Chat\Views" />
-      <Folder Include="Areas\Customer\Data" />
       <Folder Include="Areas\Customer\Models" />
       <Folder Include="Areas\Customer\Pages" />
       <Folder Include="Areas\Customer\wwwroot" />

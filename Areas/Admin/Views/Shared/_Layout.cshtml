@@ -14,7 +14,7 @@
                 <!--<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OnlineShop</a>-->
                 
                 <!--Link to the main page-->
-                @Html.ActionLink("Dashboard", "Index", "Dashboard", null, new {@class="navbar-brand"})
+                @Html.ActionLink("Online Shop", "Products", "Product", new {Area = "Admin"}, new {@class="navbar-brand"})
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -23,27 +23,26 @@
                     <!--Left menu-->
                     <ul class="navbar-nav flex-grow-1 mr-auto">
                         <li class="nav-item">
-                            @Html.ActionLink("Pages", "Index", "Page", null, new {@class="nav-link text-dark"})
-                        </li>
-                        <li class="nav-item">
-                            <a href="/" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            @Html.ActionLink("Register", "Register", "User", new {Area = "Account"}, new {@class="nav-link text-dark"})
-                        </li>
-                        <li class="nav-item">
-                            @Html.ActionLink( "Logout", "Logout", "User", new { Area = "Account" }, new {@class="nav-link text-dark"})
-                        </li>
-                        <li class="nav-item">
                             @Html.ActionLink( "Products", "Products", "Product", new { Area = "Admin" }, new {@class="nav-link text-dark"})
                         </li>
                         <li class="nav-item">
                             @Html.ActionLink( "Categories", "Categories", "Category", new { Area = "Admin" }, new {@class="nav-link text-dark"})
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                @Html.ActionLink("Logout", "Logout", "User", new {Area = "Account"}, new {@class="nav-link btn btn-link text-dark"})
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                @Html.ActionLink("Register", "Register", "User", new {Area = "Account"}, new {@class="nav-link text-dark"})
+                            </li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Login", "Login", "User", new {Area = "Account"}, new {@class="nav-link text-dark"})
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

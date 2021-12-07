@@ -85,7 +85,7 @@ namespace OnlineShop
                 endpoints.MapAreaControllerRoute(
                     name: "customer",
                     areaName: "Customer",
-                    pattern: "Customer/{controller=Customer}/{action=Index}"
+                    pattern: "Customer/{controller=Product}/{action=Index}"
                 );
                 
                 endpoints.MapHub<ChatHub>("/chat");

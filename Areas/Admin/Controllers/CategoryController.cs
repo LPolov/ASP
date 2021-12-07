@@ -1,13 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
+using OnlineShop.Areas.Admin.Services;
 using OnlineShop.Data;
 
 namespace OnlineShop.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -21,6 +24,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Categories()
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             List<Category> categories = _db.Categories.ToList();
             List<CategoryVM> categoryViews = new List<CategoryVM>();
             foreach (var category in categories)
@@ -33,6 +41,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult EditCategory(int id)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             CategoryVM model;
             Category dto = _db.Categories.Find(id);
             if (dto == null)
@@ -47,6 +60,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult EditCategory(CategoryVM model)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -69,6 +87,11 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult DeleteCategory(int id)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             Category dto = _db.Categories.Find(id);
             _db.Categories.Remove(dto);
             _db.SaveChanges();
@@ -80,12 +103,22 @@ namespace OnlineShop.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult AddCategory()
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             return View();
         }
         
         [HttpPost]
         public IActionResult AddCategory(CategoryVM model)
         {
+            if (!AdminService.IsCurrentUserAdmin(HttpContext))
+            {
+                TempData["CR"] = "Login as admin to have an access to this page.";
+                return RedirectToAction("Index", "Product", new {Area = "Customer"});
+            }
             if (!ModelState.IsValid)
             {
                 return View(model);
