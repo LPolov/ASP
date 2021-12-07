@@ -23,7 +23,7 @@ namespace OnlineShop.Areas.Customer.Data
         */
         public IEnumerable<Product> GetProducts()
         {
-            return _db.Products.OrderBy(p => p.Rate).ToList();
+            return _db.Products.OrderByDescending(p => p.Rate).ToList();
         }
         
         /*
@@ -44,7 +44,7 @@ namespace OnlineShop.Areas.Customer.Data
             return _db.Products
                 .Where(p => p.Name.ToLower().Contains(name.ToLower()) 
                             && (CategoryVM.CategoriesId.Contains(p.CategoryId) || CategoryVM.CategoriesId.Count() == 0))
-                .OrderBy(p => p.Rate)
+                .OrderByDescending(p => p.Rate)
                 .ToList();;
         }
         
@@ -54,8 +54,36 @@ namespace OnlineShop.Areas.Customer.Data
         public IEnumerable<Product> GetProductsByCategoryId(int id)
         {
             return _db.Products.Where(p => CategoryVM.CategoriesId.Contains(p.CategoryId)).
-                OrderBy(p => p.Rate)
+                OrderByDescending(p => p.Rate)
                 .ToList();
+        }
+        
+        /*
+        * Method updates product in database setting values given by user.
+        */
+        public void UpdateProduct(Product product)
+        {
+            _db.Update(product);
+            _db.SaveChanges();
+        }
+
+        /*
+         * Method deletes product from database by passed product id.
+         */
+        public void DeleteProduct(int id)
+        {
+            Product dto = _db.Products.Find(id);
+            _db.Products.Remove(dto);
+            _db.SaveChanges();
+        }
+        
+        /*
+         * Method adds new product to database.
+         */
+        public void AddProduct(Product product)
+        {
+            _db.Products.Add(product);
+            _db.SaveChanges();
         }
     }
 }

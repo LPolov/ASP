@@ -55,7 +55,7 @@ namespace OnlineShop.Areas.Account.Controllers
                 ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "admin"), new Claim("email", model.Email)}, "Cookies");
                 ClaimsPrincipal claimPrincipal = new ClaimsPrincipal(claimIdentity);
                 await HttpContext.SignInAsync("Cookies", claimPrincipal);
-                return RedirectToAction("Index", "Page", new { area = "admin" });
+                return RedirectToAction("Products", "Product", new { area = "admin" });
             }
             ClaimsIdentity claimUserIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer"), new Claim("email", model.Email)}, "Cookies");
             ClaimsPrincipal claimUserPrincipal = new ClaimsPrincipal(claimUserIdentity);

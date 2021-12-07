@@ -18,5 +18,10 @@ namespace OnlineShop.Areas.Customer.Mappers
          * Maps single Product DAO to Product DTO.
          */
         public ProductVM GetModel(Product product);
+        
+        /*
+         * Maps single Product DTO to Product DAO.
+         */
+        public Product GetProductDao(ProductVM model);
     }
 }

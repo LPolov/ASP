@@ -12,6 +12,16 @@ namespace OnlineShop.Areas.Customer.Mappers
         /*
          * Maps list of Category DAO to list of Category DTO.
          */
-        public List<CategoryVM> GetModels(IEnumerable<Category> products);
+        public List<CategoryVM> GetModels(IEnumerable<Category> category);
+        
+        /*
+        * Maps Category DAO Category DTO.
+        */
+        public CategoryVM GetModel(Category category);
+        
+        /*
+        * Maps Category DTO Category DAO.
+        */
+        public Category GetCategoryDao(CategoryVM model);
     }
 }

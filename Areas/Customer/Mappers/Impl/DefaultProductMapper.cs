@@ -42,5 +42,23 @@ namespace OnlineShop.Areas.Customer.Mappers.Impl
             model.Category = new CategoryVM(_categoryService.GetCategoryById(product.CategoryId));
             return model;
         }
+        
+        /*
+         * Maps single Product DTO to Product DAO.
+         */
+        public Product GetProductDao(ProductVM model)
+        {
+            Product product = new Product();
+            product.Name = model.Name;
+            var description = string.IsNullOrWhiteSpace(model.Description) ?
+                model.Name.Replace(" ", "-") : 
+                model.Description;
+            product.Description = description;
+            product.Price = model.Price;
+            product.Rate = model.Rate;
+            product.Image = model.Image;
+            product.CategoryId = _categoryService.GetCategoryByName(model.Category.Name).Id;
+            return product;
+        }
     }
 }

@@ -169,14 +169,7 @@
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/bin/Debug/netcoreapp3.1/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Admin/Views/Shared/_Layout.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Admin/Views/_ViewStart.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Admin/Views/Dashboard/Index.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Admin/Views/Page/Index.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Admin/Views/Page/AddPage.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Admin/Views/Page/EditPage.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Identity/Views/Account/Register.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Identity/Views/Account/Login.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Account/Views/User/Login.cshtml.g.cs
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Identity/Views/Account/LoginPage.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Account/Views/Shared/Login_Layout.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Account/Views/User/Register.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Account/Views/User/ResetPassword.cshtml.g.cs

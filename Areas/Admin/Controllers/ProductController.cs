@@ -1,312 +1,267 @@
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShop.Areas.Account.Data;
-using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
 using OnlineShop.Areas.Admin.Services;
-using OnlineShop.Data;
+using OnlineShop.Areas.Customer.Services;
 
 namespace OnlineShop.Areas.Admin.Controllers
 {
+    /*
+     * ProductController class is used to process admin requests.
+     * Only user logged in as admin have an access to its methods.
+     * It allows to do CRUD operations on products.
+     */
     [Area("Admin")]
     [Authorize]
     public class ProductController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        private static HashSet<int> CategoryIds = new HashSet<int>();
+        private IProductService _productService;
+        private ICategoryService _categoryService;
         
-        public ProductController(ApplicationDbContext db)
+        public ProductController(IProductService productService, ICategoryService categoryService)
         {
-            _db = db;
+            _productService = productService;
+            _categoryService = categoryService;
         }
-        // GET
+        
+        /*
+         * Returns view with all products from database.
+         */
         [HttpGet]
         public IActionResult Products()
         {
-            //string userType = HttpContext.User.Claims.Where(c => c.Type == "userType").First().Value;
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "Login as admin to have an access to this page.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
-
-            IEnumerable<Product> products = _db.Products.OrderByDescending(p => p.Rate).ToList();
-            List<ProductVM> productViews = new List<ProductVM>();
             
-            foreach (var product in products)
-            {
-                ProductVM productVm = new ProductVM(product);
-                productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-                productViews.Add(productVm);
-            }
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            List<CategoryVM> categoryViews = new List<CategoryVM>();
-            foreach (var category in categories)
-            {
-                CategoryVM categoryVm = new CategoryVM(category);
-                categoryViews.Add(categoryVm);
-            }
-            
+            List<ProductVM> products = _productService.GetProducts();
+            List<CategoryVM> categories = _categoryService.GetCategories();
             dynamic productPageModel = new ExpandoObject();
-            productPageModel.Products = productViews;
-            productPageModel.Categories = categoryViews;
-            productPageModel.searchWord = "";
+            productPageModel.Products = products;
+            productPageModel.Categories = categories;
             return View(productPageModel);
         }
         
+        /*
+         * Returns a page where admin can modify selected product
+        */
         [HttpGet]
         public IActionResult EditProduct(int id)
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "Login as admin to have an access to this page.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
-            ProductVM model;
-            Product dto = _db.Products.Find(id);
-            if (dto == null)
+            
+            ProductVM product = _productService.GetProductById(id);
+            
+            // If no product found error message is displayed.
+            if (product == null)
             {
                 return Content("This page does not exist.");
             }
-
-            model = new ProductVM(dto);
-            model.Category = new CategoryVM(_db.Categories.Find(dto.CategoryId));
-            return View(model);
+            
+            return View(product);
         }
         
+        /*
+         * Process request from admin to update product and updates it in database.
+         */
         [HttpPost]
         public IActionResult EditProduct(ProductVM model)
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "You are not allowed to send post requests here.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
             
+            /*
+             * If model's fields are filled with incorrect data error message will be displayed in
+             * Validation Summary area.
+             */
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            if (!_db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).Any())
+            /*
+             * If admin enters category name which does not exist in database - error message is displayed
+             * in Validation Summary area.
+             */
+            if (!_categoryService.DoesCategoryNameExist(model.Category.Name))
             {
-                List<Category> categories = _db.Categories.ToList();
-                string categoryNames = "";
-                foreach (var category in categories)
-                {
-                    categoryNames += category.Name + ", ";
-                }
-
-                categoryNames = categoryNames.Substring(0, categoryNames.Length - 2);
-                ModelState.AddModelError("", "This category does not exist. Categories available: " + categoryNames);
+                string allowedNames = _categoryService.GetCategoriesNamesAsString();
+                ModelState.AddModelError("", "This category does not exist. Categories available: " + allowedNames);
                 return View(model);
             }
-
-            Product dto = _db.Products.Find(model.Id);
-            Category newCategoryDto = _db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).First();
             
-            dto.UpdateByModel(model);
-            dto.CategoryId = newCategoryDto.Id;
-            _db.Update(dto);
-            _db.SaveChanges();
-            // send successful message
-            TempData["PSM"] = "You have updated " + dto.Name + " product.";
+            _productService.UpdateProductByModel(model);
+            
+            // Send successful message when model successfully updated
+            TempData["PSM"] = "You have updated " + model.Name + " product.";
             return RedirectToAction("Products");
         }
+        
+        /*
+         * Method allows to search products by name. It takes name from user and searches products
+         * with names which contain it.
+         */
         [HttpPost]
-        public IActionResult Products(string searchWord)
+        public IActionResult Products(string name)
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "You are not allowed to send post requests here.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
-            if (String.IsNullOrEmpty(searchWord))
-            {
-                return RedirectToAction("Products");
-            }
 
-            IEnumerable<Product> products = _db.Products
-                .Where(p => p.Name.ToLower().Contains(searchWord.ToLower()) && (CategoryIds.Contains(p.CategoryId) || CategoryIds.Count() == 0))
-                .OrderBy(p => p.Rate)
-                .ToList();
-
-            List<ProductVM> productViews = new List<ProductVM>();
-            
-            foreach (var product in products)
-            {
-                ProductVM productVm = new ProductVM(product);
-                productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-                productViews.Add(productVm);
-            }
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            List<CategoryVM> categoryViews = new List<CategoryVM>();
-            foreach (var category in categories)
-            {
-                CategoryVM categoryVm = new CategoryVM(category);
-                if (CategoryIds.Contains(category.Id))
-                {
-                    categoryVm.IsChecked = true;
-                }
-
-                categoryViews.Add(categoryVm);
-            }
-            
+            List<ProductVM> products = _productService.GetProductsByName(name);
+            IEnumerable<CategoryVM> categories = _categoryService.GetCategories();
             dynamic productPageModel = new ExpandoObject();
-            productPageModel.Products = productViews;
-            productPageModel.Categories = categoryViews;
-            if (products.Count() == 0)
+            productPageModel.Products = products;
+            productPageModel.Categories = categories;
+            
+            if (products.Any())
             {
-                ModelState.AddModelError("", "Product not found.");
-                return View(productPageModel);
+                return View("Products", productPageModel);
             }
-            return View("Products", productPageModel);
+            
+            // If no product's name matches received word then error message is displayed on the page
+            ModelState.AddModelError("", "Product not found.");
+            return View(productPageModel);
         }
         
+        /*
+         * Displays products by category
+         */
         [HttpGet]
         public IActionResult ProductsByCategories(int categoryId)
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "Login as admin to have an access to this page.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
-            if (!CategoryIds.Contains(categoryId))
-            {
-                CategoryIds.Add(categoryId);
-            }
-            else
-            {
-                CategoryIds.Remove(categoryId);
-            }
-
-            if (CategoryIds.Count() == 0)
-            {
-                return RedirectToAction("Products");
-            }
-
-            List<Product> products = _db.Products.Where(p => CategoryIds.Contains(p.CategoryId)).OrderBy(p => p.Rate).ToList();
-            List<ProductVM> productViews = new List<ProductVM>();
-            foreach (var product in products)
-            {
-                ProductVM productVm = new ProductVM(product);
-                productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-                productViews.Add(productVm);
-            }
-
-            IEnumerable<Category> categories = _db.Categories.ToList();
-            List<CategoryVM> categoryViews = new List<CategoryVM>();
-            foreach (var category in categories)
-            {
-                CategoryVM categoryVm = new CategoryVM(category);
-                if (CategoryIds.Contains(category.Id))
-                {
-                    categoryVm.IsChecked = !categoryVm.IsChecked;
-                }
-
-                categoryViews.Add(categoryVm);
-            }
             
+            List<ProductVM> products = _productService.GetProductsByCategoryId(categoryId);
+            List<CategoryVM> categories = _categoryService.GetCategories();
             dynamic productPageModel = new ExpandoObject();
-            productPageModel.Products = productViews;
-            productPageModel.Categories = categoryViews;
-            productPageModel.searchWord = "";
+            productPageModel.Products = products;
+            productPageModel.Categories = categories;
+            
             return View("Products", productPageModel);
         }
         
+        /*
+         * Deletes product from db by passed product id.
+         */
         [HttpGet]
         public IActionResult DeleteProduct(int id)
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "Login as admin to have an access to this page.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
-            Product dto = _db.Products.Find(id);
-            _db.Products.Remove(dto);
-            _db.SaveChanges();
-            // send successful message
-            TempData["PSM"] = "You have deleted " + dto.Name + " product.";
+            
+            _productService.DeleteProduct(id);
+            
+            // Send successful message when product is successfully deleted.
+            TempData["PSM"] = "You have deleted product.";
             return RedirectToAction("Products");
         }
         
+        /*
+         * Returns page to add new product.
+         */
         [HttpGet]
         public IActionResult AddProduct()
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "Login as admin to have an access to this page.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
+            
             return View();
         }
         
+        /*
+         * Takes all data from admin and creates new product in database based on this data.
+         */
         [HttpPost]
         public IActionResult AddProduct(ProductVM model)
         {
+            /*
+             * If user is not authorized as admin Connection Refused error message is displayed
+             * on Products page
+             */
             if (!AdminService.IsCurrentUserAdmin(HttpContext))
             {
                 TempData["CR"] = "Login as admin to have an access to this page.";
                 return RedirectToAction("Index", "Product", new {Area = "Customer"});
             }
+            
+            /*
+             * If model's fields are filled with incorrect data error message will be displayed in
+             * Validation Summary area.
+             */
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-
-            string description;
-            Product dto = new Product();
-            dto.Name = model.Name.ToLower();
-            if (string.IsNullOrWhiteSpace(model.Description))
-            {
-                description = model.Name.Replace(" ", "-");
-            }
-            else
-            {
-                description = model.Description;
-            }
-
-            if (_db.Products.Any(p => p.Name == model.Name.ToLower()))
-            {
-                ModelState.AddModelError("", "This name already exists.");
-                return View(model);
-            }
-
-            dto.Description = description;
-            dto.Price = model.Price;
-            dto.Rate = model.Rate;
-            dto.Image = model.Image;
             
-            if (!_db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).Any())
+            /*
+             * If admin enters category name which does not exist in database - error message is displayed
+             * in Validation Summary area.
+             */
+            if (!_categoryService.DoesCategoryNameExist(model.Category.Name))
             {
-                List<Category> categories = _db.Categories.ToList();
-                string categoryNames = "";
-                foreach (var category in categories)
-                {
-                    categoryNames += category.Name + ", ";
-                }
-
-                categoryNames = categoryNames.Substring(0, categoryNames.Length - 2);
-                ModelState.AddModelError("", "This category does not exist. Categories available: " + categoryNames);
+                string allowedNames = _categoryService.GetCategoriesNamesAsString();
+                ModelState.AddModelError("", "This category does not exist. Categories available: " + allowedNames);
                 return View(model);
             }
             
-            Category newCategoryDto = _db.Categories.Where(c => c.Name.ToLower() == model.Category.Name.ToLower()).First();
+            _productService.AddProduct(model);
             
-            dto.UpdateByModel(model);
-            dto.CategoryId = newCategoryDto.Id;
-
-            _db.Products.Add(dto);
-            _db.SaveChanges();
-            // send successful message
+            // Send successful message when new product is successfully added.
             TempData["PSM"] = "You have added new product";
             return RedirectToAction("Products");
         }
     }
-    
-    
 }

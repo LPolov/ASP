@@ -18,15 +18,36 @@ namespace OnlineShop.Areas.Customer.Mappers.Impl
             List<CategoryVM> models = new List<CategoryVM>();
             foreach (var category in categories)
             {
-                CategoryVM categoryVm = new CategoryVM(category);
-                if (CategoryVM.CategoriesId.Contains(category.Id))
-                {
-                    categoryVm.IsChecked = true;
-                }
+                CategoryVM categoryVm = GetModel(category);
                 models.Add(categoryVm);
             }
-
             return models;
+        }
+        
+        /*
+        * Maps Category DAO Category DTO.
+        */
+        public CategoryVM GetModel(Category category)
+        {
+            CategoryVM model = new CategoryVM(category);
+            if (CategoryVM.CategoriesId.Contains(category.Id))
+            {
+                model.IsChecked = true;
+            }
+            return model;
+        }
+        
+        /*
+        * Maps Category DTO Category DAO.
+        */
+        public Category GetCategoryDao(CategoryVM model)
+        {
+            Category category = new Category();
+            category.Name = model.Name.ToLower();
+            category.Description = string.IsNullOrWhiteSpace(model.Description) ? 
+                model.Name.Replace(" ", "-").ToLower() : 
+                model.Description;
+            return category;
         }
     }
 }

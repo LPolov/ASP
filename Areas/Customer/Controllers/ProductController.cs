@@ -3,10 +3,8 @@ using System.Dynamic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineShop.Areas.Admin.Data;
 using OnlineShop.Areas.Admin.Models;
 using OnlineShop.Areas.Customer.Services;
-using OnlineShop.Data;
 
 namespace OnlineShop.Areas.Customer.Controllers
 {
@@ -19,13 +17,11 @@ namespace OnlineShop.Areas.Customer.Controllers
     {
         private IProductService _productService;
         private ICategoryService _categoryService;
-        private readonly ApplicationDbContext _db;
 
-        public ProductController(IProductService productService, ICategoryService categoryService, ApplicationDbContext db)
+        public ProductController(IProductService productService, ICategoryService categoryService)
         {
             _productService = productService;
             _categoryService = categoryService;
-            _db = db;
         }
 
         /*
@@ -71,7 +67,7 @@ namespace OnlineShop.Areas.Customer.Controllers
             productPageModel.Products = products;
             productPageModel.Categories = categories;
             
-            //If no product's name matches received word then error message is displayed on the page
+            // If no product's name matches received word then error message is displayed on the page
             if (products.Count() == 0)
             {
                 TempData["MNF"] = "Products not found.";
@@ -86,11 +82,11 @@ namespace OnlineShop.Areas.Customer.Controllers
         [HttpGet]
         public IActionResult ProductsByCategories(int categoryId)
         {
-            List<ProductVM> productViews = _productService.GetProductsByCategoryId(categoryId);
+            List<ProductVM> products = _productService.GetProductsByCategoryId(categoryId);
             List<CategoryVM> categories = _categoryService.GetCategories();
             
             dynamic productPageModel = new ExpandoObject();
-            productPageModel.Products = productViews;
+            productPageModel.Products = products;
             productPageModel.Categories = categories;
             return View("Products", productPageModel);
         }
@@ -104,10 +100,7 @@ namespace OnlineShop.Areas.Customer.Controllers
         [Authorize]
         public IActionResult ProductDetails(int id)
         {
-            Product product = _db.Products.Find(id);
-            ProductVM productVm = new ProductVM(product);
-            productVm.Category = new CategoryVM(_db.Categories.Find(product.CategoryId));
-            return View(productVm);
+            return View(_productService.GetProductById(id));
         }
     }
 }

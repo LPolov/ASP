@@ -83,16 +83,17 @@ namespace OnlineShop
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapAreaControllerRoute(
-                    name: "pages",
-                    areaName: "Admin",
-                    pattern: "Admin/{controller=Page}/{action=Index}/{id?}"
-                );
-                
+
                 endpoints.MapAreaControllerRoute(
                     name: "account",
                     areaName: "Account",
                     pattern: "Account/{controller=User}/{action=Login}/{id?}"
+                );
+                
+                endpoints.MapAreaControllerRoute(
+                    name: "admin",
+                    areaName: "Admin",
+                    pattern: "Admin/{controller=Product}/{action=Products}/{id?}"
                 );
                 
                 endpoints.MapAreaControllerRoute(

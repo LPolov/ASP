@@ -14,11 +14,13 @@ namespace OnlineShop.Areas.Customer.Services
     {
         private ProductsRepository _repository;
         private IProductMapper _productMapper;
+        private ICategoryService _categoryService;
 
-        public DefaultProductService(ProductsRepository repository, IProductMapper productMapper)
+        public DefaultProductService(ProductsRepository repository, IProductMapper productMapper, ICategoryService categoryService)
         {
             _repository = repository;
             _productMapper = productMapper;
+            _categoryService = categoryService;
         }
 
         /*
@@ -84,6 +86,42 @@ namespace OnlineShop.Areas.Customer.Services
         {
             Product product = _repository.GetProductById(id);
             return _productMapper.GetModel(product);
+        }
+        
+        /*
+         * Method updates product in database setting values given by user.
+         */
+        public void UpdateProductByModel(ProductVM model)
+        {
+            Product product = _repository.GetProductById(model.Id);
+            CategoryVM category = _categoryService.GetCategoryByName(model.Category.Name.ToLower());
+
+            if (product.Id == model.Id)
+            {
+                product.Name = model.Name;
+                product.Description = model.Description;
+                product.Price = model.Price;
+                product.Rate = model.Rate;
+                product.Image = model.Image;
+                product.CategoryId = category.Id;
+            }
+            _repository.UpdateProduct(product);
+        }
+        
+        /*
+         * Method deletes product from database by passed product id.
+         */
+        public void DeleteProduct(int id)
+        {
+            _repository.DeleteProduct(id);
+        }
+        
+        /*
+         * Method adds new product to database.
+         */
+        public void AddProduct(ProductVM model)
+        {
+            _repository.AddProduct(_productMapper.GetProductDao(model));
         }
     }
 }

@@ -29,5 +29,20 @@ namespace OnlineShop.Areas.Customer.Services
          * Gets product from repository by id.
          */
         public ProductVM GetProductById(int id);
+
+        /*
+         * Method updates product in database setting values given by user.
+         */
+        public void UpdateProductByModel(ProductVM model);
+        
+        /*
+         * Method deletes product from database by passed product id.
+         */
+        public void DeleteProduct(int id);
+        
+        /*
+         * Method adds new product to database.
+         */
+        public void AddProduct(ProductVM model);
     }
 }
