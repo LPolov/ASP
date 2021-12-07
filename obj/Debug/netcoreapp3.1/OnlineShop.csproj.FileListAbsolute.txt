@@ -188,3 +188,5 @@
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Customer/Views/Shared/_Customer_Layout.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Customer/Views/Product/Index.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Customer/Views/_ViewStart.cshtml.g.cs
+/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Chat/Views/Shared/_AdminChatLayout.cshtml.g.cs
+/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Chat/Views/Shared/_CustomerChatLayout.cshtml.g.cs

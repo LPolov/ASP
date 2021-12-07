@@ -12,6 +12,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OnlineShop.Areas.Account.Data.Repositories;
+using OnlineShop.Areas.Account.Mappers;
+using OnlineShop.Areas.Account.Mappers.Impl;
+using OnlineShop.Areas.Account.Services;
+using OnlineShop.Areas.Account.Services.Impl;
 using OnlineShop.Areas.Chat.Data;
 using OnlineShop.Areas.Customer.Data;
 using OnlineShop.Areas.Customer.Mappers;
@@ -44,12 +49,15 @@ namespace OnlineShop
            //Add Services to context
            services.AddTransient<IProductService, DefaultProductService>();
            services.AddTransient<ICategoryService, DefaultCategoryService>();
+           services.AddTransient<IUserService, DefaultUserService>();
            //Add repositories
            services.AddTransient<ProductsRepository>();
            services.AddTransient<CategoryRepository>();
+           services.AddTransient<UserRepository>();
            //Add mappers
            services.AddTransient<IProductMapper, DefaultProductMapper>();
            services.AddTransient<ICategoryMapper, DefaultCategoryMapper>();
+           services.AddTransient<IUserMapper, DefaultUserMapper>();
            
            //Authentication
            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -102,7 +110,7 @@ namespace OnlineShop
                     pattern: "Customer/{controller=Product}/{action=Index}"
                 );
                 
-                endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapHub<ChatHub>("/chat/Chat/Index");
                 endpoints.MapAreaControllerRoute(
                     name: "chat",
                     areaName: "Chat",

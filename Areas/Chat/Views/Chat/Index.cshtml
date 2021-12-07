@@ -2,10 +2,18 @@
 
 @{
     ViewBag.Title = "title";
-    Layout = "_Layout";
+    if (Model.IsAdmin)
+    {
+        Layout = "_AdminChatLayout";
+    }
+    else
+    {
+        Layout = "_CustomerChatLayout";
+    }
+
 }
 
-<div class="container">
+    <div class="container">
     <!--Div contains hidden input to contain logged in user's name and button to connect to chat server-->
     <div id="userinfo" class="row">
         <input type="text" hidden="hidden" class="form-control" value="@Model.FName @Model.LName" id="username" name="username" autocomplete="off"/>
@@ -36,7 +44,7 @@
 <!--Script is used to dynamically change page when user joins and pass needed parameters to the chat server-->
 <script>
     "use strict";
-    var connection = new signalR.HubConnectionBuilder().withUrl('/chat').build();
+    var connection = new signalR.HubConnectionBuilder().withUrl('/chat/Chat/Index').build();
     var username = "";
     
     document.getElementById("sendButton").disabled = false;

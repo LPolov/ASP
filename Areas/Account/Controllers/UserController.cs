@@ -1,65 +1,65 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
 using OnlineShop.Areas.Account.Data;
 using OnlineShop.Areas.Account.Models;
-using OnlineShop.Data;
+using OnlineShop.Areas.Account.Services;
 
 namespace OnlineShop.Areas.Account.Controllers
 {
+    /*
+     * This controller is used for login, registration and logout.
+     */
     [Area("Account")]
     public class UserController : Controller
     {
-        private readonly ApplicationDbContext _db;
+        private IUserService _userService;
         
-        public UserController(ApplicationDbContext db)
+        public UserController(IUserService userService)
         {
-            _db = db;
+            _userService = userService;
         }
         
-        // GET
+        /*
+         * Returns a view to login.
+         */
         [HttpGet(Name = "login")]
         public IActionResult Login()
         {
             return View();
         }
         
+        /*
+         * Process user request to login.
+         */
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginUserVM model)
         {
+            /*
+             * If user model's fields store incorrect data error message will be displayed.
+             */
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
             
-            if (!_db.ApplicationUsers.Any(u => u.Email == model.Email.ToLower())) 
+            /*
+             * If user model's fields store incorrect data error message will be displayed.
+             */
+            if (!_userService.IsAuthorizedUser(model)) 
             {
-                ModelState.AddModelError("", "This email not found");
+                ModelState.AddModelError("", "Email or password is invalid");
                 return View(model);
             }
             
-            if (!_db.ApplicationUsers.Any(u => u.Password == model.Password)) 
+            if (_userService.IsAdmin(model))
             {
-                ModelState.AddModelError("", "Password is incorrect");
-                return View(model);
-            }
-            if (_db.ApplicationUsers.Where(u => u.IsAdmin).Any(u => u.Email == model.Email.ToLower()))
-            {
-                ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "admin"), new Claim("email", model.Email)}, "Cookies");
-                ClaimsPrincipal claimPrincipal = new ClaimsPrincipal(claimIdentity);
-                await HttpContext.SignInAsync("Cookies", claimPrincipal);
+                await HttpContext.SignInAsync("Cookies", _userService.GetPrincipal(model, "admin"));
                 return RedirectToAction("Products", "Product", new { area = "admin" });
             }
-            ClaimsIdentity claimUserIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer"), new Claim("email", model.Email)}, "Cookies");
-            ClaimsPrincipal claimUserPrincipal = new ClaimsPrincipal(claimUserIdentity);
-            await HttpContext.SignInAsync("Cookies", claimUserPrincipal);
+            await HttpContext.SignInAsync("Cookies",  _userService.GetPrincipal(model, "customer"));
             return RedirectToAction("Index", "Product", new { area = "Customer" });
         }
 
@@ -85,28 +85,14 @@ namespace OnlineShop.Areas.Account.Controllers
                 return View(model);
             }
             
-            if (_db.ApplicationUsers.Any(u => u.Email == model.Email.ToLower())) 
+            ClaimsPrincipal claimPrincipal = _userService.RegisterUser(model);
+            
+            if (claimPrincipal == null)
             {
-                ModelState.AddModelError("", "This email is already registered.");
+                ModelState.AddModelError("", "Either email is already registered or password confirmation" +
+                                             " mismatches password. Check entered data.");
                 return View(model);
             }
-            
-            if (model.Password != model.ConfirmPassword) 
-            {
-                ModelState.AddModelError("", "Password and password confirmation are not equal.");
-                return View(model);
-            }
-
-            ApplicationUser dto = new ApplicationUser();
-            dto.FName = model.FName;
-            dto.LName = model.LName;
-            dto.Email = model.Email;
-            dto.Password = model.Password;
-            _db.ApplicationUsers.Add(dto);
-            _db.SaveChanges();
-            
-            ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", "customer"), new Claim("email", model.Email)}, "Cookies");
-            ClaimsPrincipal claimPrincipal = new ClaimsPrincipal(claimIdentity);
             await HttpContext.SignInAsync("Cookies", claimPrincipal);
             return RedirectToAction("Index", "Product", new { area = "customer" });
         }
@@ -124,24 +110,15 @@ namespace OnlineShop.Areas.Account.Controllers
             {
                 return View(model);
             }
-            
-            if (!_db.ApplicationUsers.Any(u => u.Email == model.Email.ToLower())) 
-            {
-                ModelState.AddModelError("", "This email is not registered.");
-                return View(model);
-            }
-            
-            if (model.Password != model.PasswordConfirmation) 
-            {
-                ModelState.AddModelError("", "Password and password confirmation are not equal.");
-                return View(model);
-            }
 
-            ApplicationUser dto = _db.ApplicationUsers.Where(u => u.Email == model.Email).First();
-            dto.Password = model.Password;
-            _db.ApplicationUsers.Update(dto);
-            _db.SaveChanges();
-            return RedirectToAction("Index", "Product", new { area = "customer" });
+            ApplicationUser dto = _userService.ResetPassword(model);
+            if (dto != null)
+            {
+                return RedirectToAction("Index", "Product", new {area = "customer"});
+            }
+            ModelState.AddModelError("", "Either email is already registered or password confirmation" +
+                                         " mismatches password. Check entered data.");
+            return View(model);
         }
     }
 }
