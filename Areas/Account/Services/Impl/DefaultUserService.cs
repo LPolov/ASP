@@ -7,6 +7,9 @@ using OnlineShop.Areas.Account.Models;
 
 namespace OnlineShop.Areas.Account.Services.Impl
 {
+    /*
+     * Default implementation of IUserService.
+     */
     public class DefaultUserService : IUserService
     {
         private UserRepository _repository;
@@ -17,22 +20,35 @@ namespace OnlineShop.Areas.Account.Services.Impl
             _repository = repository;
             _userMapper = userMapper;
         }
+        
+        /*
+         * Returns true if passed user is registered and password matches to password in db.
+         */
         public bool IsAuthorizedUser(LoginUserVM user)
         {
             return _repository.IsAuthorizedUser(user);
         }
 
+        /*
+         * Returns true if passed user is admin.
+         */
         public bool IsAdmin(LoginUserVM user)
         {
             return _repository.IsAdmin(user);
         }
 
+        /*
+         * Returns ClaimsPrincipal for given user by his/her type.
+         */
         public ClaimsPrincipal GetPrincipal(LoginUserVM user, string userType)
         {
             ClaimsIdentity claimIdentity = new ClaimsIdentity(new List<Claim>() {new Claim("userType", userType), new Claim("email", user.Email)}, "Cookies");
             return  new ClaimsPrincipal(claimIdentity);
         }
 
+        /*
+         * Register passed user and returns her/his ClaimsPrincipal.
+         */
         public ClaimsPrincipal RegisterUser(ResetPasswordVM user)
         {
             if (!_repository.IsEmailAlreadyRegistered(user) && user.Password == user.PasswordConfirmation)
@@ -44,6 +60,9 @@ namespace OnlineShop.Areas.Account.Services.Impl
             return null;
         }
 
+        /*
+         * Resets password for passed user.
+         */
         public ApplicationUser ResetPassword(ResetPasswordVM user)
         {
             if (_repository.IsEmailAlreadyRegistered(user) && user.Password == user.PasswordConfirmation)

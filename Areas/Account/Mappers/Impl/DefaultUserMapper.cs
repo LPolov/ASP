@@ -3,6 +3,9 @@ using OnlineShop.Areas.Account.Models;
 
 namespace OnlineShop.Areas.Account.Mappers.Impl
 {
+    /*
+     * Default implementation of IUserMapper.
+     */
     public class DefaultUserMapper : IUserMapper
     {
         public ApplicationUser GetProductDao(ResetPasswordVM model)
