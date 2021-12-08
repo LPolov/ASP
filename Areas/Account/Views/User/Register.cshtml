@@ -5,10 +5,9 @@
     Layout = "Login_Layout";
 }
 
-<h2>Register an account</h2>
+<h2 class="d-flex justify-content-center">Register an account</h2>
 
-<div class="justify-content-center">
-    @using (Html.BeginForm())
+@using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
         <div class="form-horizontal align-items-center">
@@ -57,4 +56,3 @@
             </div>
         </div>
     }
-</div>
