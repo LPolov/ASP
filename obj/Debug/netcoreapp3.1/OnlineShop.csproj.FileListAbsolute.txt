@@ -79,7 +79,6 @@
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/OnlineShop.TagHelpers.input.cache
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/OnlineShop.TagHelpers.output.cache
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/OnlineShop.RazorCoreGenerate.cache
-/Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Areas/Identity/Pages/_ViewStart.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Views/Home/Index.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Views/Home/Privacy.cshtml.g.cs
 /Users/leontiipolovinko/RiderProjects/OnlineShop/OnlineShop/obj/Debug/netcoreapp3.1/Razor/Views/Shared/Error.cshtml.g.cs

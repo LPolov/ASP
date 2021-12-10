@@ -18,13 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Areas\Identity\Controllers" />
-      <Folder Include="Areas\Identity\Data" />
-      <Folder Include="Areas\Identity\Models" />
-      <Folder Include="Areas\Identity\Views" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Include="wwwroot\Img\Milk.jpeg" />
     </ItemGroup>
 
@@ -33,6 +26,7 @@
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Page\EditPage.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Page\Index.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Admin\Views\Dashboard\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
     </ItemGroup>
 
 </Project>
